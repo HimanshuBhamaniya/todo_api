@@ -84,7 +84,7 @@ async def update_todo(
     await db.refresh(todo)
     return todo
 
-@router.delete("/{todo_id}", status.HTTP_204_NO_CONTENT)
+@router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
     todo_id: int,
     db: AsyncSession = Depends(deps.get_db),
