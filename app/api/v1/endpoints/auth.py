@@ -47,7 +47,7 @@ async def login(
     if not user or not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            details="Incorrect email or password",
+            detail="Incorrect email or password",
         )
 
     if not user.is_active:
