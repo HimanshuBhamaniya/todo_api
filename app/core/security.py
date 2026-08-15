@@ -7,11 +7,16 @@ from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    password_bytes = password.encode("utf-8")[:72]
+    return pwd_context.hash(password_bytes.decode("utf-8", errors="ignore"))
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    plain_password_bytes = plain_password.encode("utf-8")[:72]
+    return pwd_context.verify(
+        plain_password_bytes.decode("utf-8", errors="ignore"), 
+        hashed_password
+    )
 
 def create_access_token(
         subject: Union[str, Any], expires_delta: timedelta | None = None
