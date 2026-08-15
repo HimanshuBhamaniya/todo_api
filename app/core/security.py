@@ -1,26 +1,31 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union
+import bcrypt
 import jwt
-from passlib.context import CryptContext
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password: str) -> str:
+    """Hash a raw string password using bcrypt."""
+    # Truncate to 72 bytes to conform with standard bcrypt limits
     password_bytes = password.encode("utf-8")[:72]
-    return pwd_context.hash(password_bytes.decode("utf-8", errors="ignore"))
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    return hashed.decode("utf-8")
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    plain_password_bytes = plain_password.encode("utf-8")[:72]
-    return pwd_context.verify(
-        plain_password_bytes.decode("utf-8", errors="ignore"), 
-        hashed_password
-    )
+    """Verify a plain password against a stored bcrypt hash string."""
+    password_bytes = plain_password.encode("utf-8")[:72]
+    hashed_bytes = hashed_password.encode("utf-8")
+    return bcrypt.checkpw(password_bytes, hashed_bytes)
+
 
 def create_access_token(
-        subject: Union[str, Any], expires_delta: timedelta | None = None
+    subject: Union[str, Any], expires_delta: timedelta | None = None
 ) -> str:
+    """Generate a signed JWT access token."""
     now = datetime.now(timezone.utc)
     if expires_delta:
         expire = now + expires_delta
