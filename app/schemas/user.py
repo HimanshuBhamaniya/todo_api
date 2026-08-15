@@ -17,7 +17,7 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = Field(None, min_length=8, max_length=128)
 
-class UserRead(UserBase):
+class UserResponse(UserBase):
     id: int
     is_active: bool
     created_at: datetime
