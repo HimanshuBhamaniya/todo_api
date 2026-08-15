@@ -6,11 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api import deps
 from app.models.todo import Todo
 from app.models.user import User
-from app.schemas.todo import TodoCreate, TodoResponse, TodoUpdate
+from app.schemas.todo import TodoCreate, TodoRead, TodoUpdate
 
 router = APIRouter()
 
-@router.get("/", response_model=List[TodoResponse])
+@router.get("/", response_model=List[TodoRead])
 async def read_todos(
     db: AsyncSession = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_user),
@@ -28,7 +28,7 @@ async def read_todos(
     result = await db.execute(query)
     return result.scalars().all()
 
-@router.post("/", response_model=TodoResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=TodoRead, status_code=status.HTTP_201_CREATED)
 async def create_todo(
     todo_in: TodoCreate,
     db: AsyncSession = Depends(deps.get_db),
@@ -41,7 +41,7 @@ async def create_todo(
     await db.refresh(todo)
     return todo
 
-@router.get("/{todo_id}", response_model=TodoResponse)
+@router.get("/{todo_id}", response_model=TodoRead)
 async def read_todo(
     todo_id: int,
     db: AsyncSession = Depends(deps.get_db),
@@ -58,7 +58,7 @@ async def read_todo(
         )
     return todo
 
-@router.put("/{todo_id}", response_model=TodoResponse)
+@router.put("/{todo_id}", response_model=TodoRead)
 async def update_todo(
     todo_id: int,
     todo_in: TodoUpdate,
